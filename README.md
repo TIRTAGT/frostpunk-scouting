@@ -2,6 +2,8 @@
 
 A small set of tools to help visualize [Frostpunk](https://frostpunkgame.com/) scouting locations, discoveries and rewards
 
+**[View the latest scouting cheatsheet](https://tirtagt.github.io/frostpunk-scouting/)**
+
 > **Disclaimer**<br>
 > This is an unofficial fan project. Not affiliated with, endorsed by, or sponsored by 11 bit studios (Frostpunk) or Fandom
 
