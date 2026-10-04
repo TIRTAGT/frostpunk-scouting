@@ -9,7 +9,8 @@ Requires Python 3 (standard library only) and the `mysql`/`mariadb` client
 ## Usage
 
 ```bash
-./export.py # database -> build/index.html
+./export.py                              # database -> build/index.html, canonical/OG URLs default to http://127.0.0.1
+SITE_URL=https://example.com ./export.py # override the base URL used for canonical/OG/Twitter meta tags (no trailing slash)
 ```
 
 ## Files
@@ -18,6 +19,7 @@ Requires Python 3 (standard library only) and the `mysql`/`mariadb` client
 |---|---|
 | `export.py` | Queries the database and writes `build/index.html` |
 | `template.html` | Page layout, styles and script; `/*__DATA__*/null` is replaced with the data |
+| `og-image.png` | Social preview image (1200x630), copied to `build/` alongside `index.html` |
 | `build/` | Generated output |
 
 ## Notes
@@ -25,3 +27,4 @@ Requires Python 3 (standard library only) and the `mysql`/`mariadb` client
 - Reward types are read from the `has_*` columns of `locations` and `rewards`, so new flag columns appear on the page without code changes. Add them to `REWARD_TYPES` in `export.py` for a proper display name, category (chip color) and position.
 - The reward filter matches a location when a single choice yields all selected rewards; location-level flags (Trading Post) count for every choice.
 - The page credits the Frostpunk Wiki (CC BY-NC-SA); keep the footer when publishing.
+- `template.html`'s `<head>` has SEO/social meta tags (description, Open Graph, Twitter Card). The `__SITE_URL__` placeholder in canonical/`og:url`/`og:image`/`twitter:image` is replaced with the `SITE_URL` env var (no trailing slash; defaults to `http://127.0.0.1`) — set it to the real deployed URL in CI or when publishing.

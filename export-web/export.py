@@ -14,8 +14,10 @@ import sys
 
 DIR = pathlib.Path(__file__).resolve().parent
 TEMPLATE = DIR / "template.html"
+OG_IMAGE = DIR / "og-image.png"
 OUT = DIR / "build" / "index.html"
 PLACEHOLDER = "/*__DATA__*/null"
+SITE_URL_PLACEHOLDER = "__SITE_URL__"
 
 # Display name and category per reward flag column. Every "has_*" column in the
 # locations/rewards tables must be listed here.
@@ -134,8 +136,12 @@ def export():
 	if PLACEHOLDER not in template:
 		raise ExportError(f"Placeholder {PLACEHOLDER!r} not found in {TEMPLATE.name}")
 
+	site_url = os.environ.get("SITE_URL", "http://127.0.0.1").rstrip("/")
+
 	OUT.parent.mkdir(exist_ok=True)
-	OUT.write_text(template.replace(PLACEHOLDER, payload), encoding="utf-8")
+	html = template.replace(PLACEHOLDER, payload).replace(SITE_URL_PLACEHOLDER, site_url)
+	OUT.write_text(html, encoding="utf-8")
+	shutil.copyfile(OG_IMAGE, OUT.parent / OG_IMAGE.name)
 	return {"scenarios": len(scenarios), "locations": len(locations), "rewards": len(rewards),
 		"discoveries": len(discoveries)}
 
