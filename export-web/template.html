@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Frostpunk Scouting Cheatsheet</title>
+		<style>
+			:root {
+				--bg: #0f141a;
+				--panel: #18212b;
+				--panel-2: #1f2a36;
+				--border: #2c3a48;
+				--text: #dde6ee;
+				--muted: #8a9aab;
+				--accent: #f0a04b;
+				--link: #8cc4f0;
+				--c-resource: #6fa8d6;
+				--c-people: #7cc48a;
+				--c-special: #e0b060;
+				--c-risk: #e0685a;
+				--c-other: #9aa5b1;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			/* All sizes below are in rem, so changing this one value scales the whole page. */
+			html {
+				font-size: 17px;
+			}
+
+			body {
+				margin: 0;
+				background: var(--bg);
+				color: var(--text);
+				font: 1rem/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+			}
+
+			/* Header & controls */
+
+			header {
+				position: sticky;
+				top: 0;
+				z-index: 10;
+				background: rgba(15, 20, 26, 0.96);
+				border-bottom: 1px solid var(--border);
+				padding: 0.75rem 1.25rem;
+			}
+
+			.title-row {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				gap: 1.2rem;
+				margin: 0 0 0.6rem;
+			}
+
+			h1 {
+				margin: 0;
+				font-size: 1.5rem;
+				letter-spacing: 0.5px;
+			}
+
+			h1 span {
+				color: var(--accent);
+			}
+
+			.filters, .controls {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.4rem;
+				align-items: center;
+			}
+
+			.controls {
+				margin-bottom: 0.5rem;
+				gap: 0.75rem;
+			}
+
+			button, input, select {
+				font: inherit;
+				color: var(--text);
+				background: var(--panel-2);
+				border: 1px solid var(--border);
+				border-radius: 6px;
+			}
+
+			button {
+				padding: 0.3rem 0.75rem;
+				cursor: pointer;
+			}
+
+			button:hover {
+				border-color: var(--muted);
+			}
+
+			label.field {
+				display: flex;
+				gap: 0.4rem;
+				align-items: center;
+				color: var(--muted);
+			}
+
+			input[type=search] {
+				padding: 0.35rem 0.6rem;
+				min-width: 16rem;
+			}
+
+			input[type=checkbox] {
+				width: 1.1rem;
+				height: 1.1rem;
+			}
+
+			select {
+				padding: 0.3rem 0.5rem;
+			}
+
+			.filters .hint {
+				color: var(--muted);
+				margin-right: 0.25rem;
+			}
+
+			/* Reward type chips */
+
+			.chip {
+				display: inline-block;
+				padding: 0.05rem 0.55rem;
+				border-radius: 999px;
+				border: 1px solid currentColor;
+				font-size: 0.9rem;
+				white-space: nowrap;
+			}
+
+			.chip.resource {
+				color: var(--c-resource);
+			}
+
+			.chip.people {
+				color: var(--c-people);
+			}
+
+			.chip.special {
+				color: var(--c-special);
+			}
+
+			.chip.risk {
+				color: var(--c-risk);
+			}
+
+			.chip.other {
+				color: var(--c-other);
+			}
+
+			button.chip {
+				background: transparent;
+				padding: 0.15rem 0.65rem;
+			}
+
+			button.chip.on {
+				background: currentColor;
+			}
+
+			button.chip.on span {
+				color: var(--bg);
+				font-weight: 600;
+			}
+
+			/* Main content & location list */
+
+			main {
+				padding: 1rem 1.25rem 2.5rem;
+			}
+
+			.scenario-notes {
+				color: var(--muted);
+				margin: 0 0 0.75rem;
+				max-width: 60rem;
+			}
+
+			.summary {
+				color: var(--muted);
+				margin-bottom: 0.75rem;
+			}
+
+			.list {
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				overflow: hidden;
+			}
+
+			.row {
+				display: grid;
+				grid-template-columns: minmax(12rem, 1fr) minmax(18rem, 2.2fr) minmax(14rem, 1.4fr);
+				gap: 1.25rem;
+				padding: 0.75rem 1rem;
+				background: var(--panel);
+				border-top: 1px solid var(--border);
+			}
+
+			.row:nth-child(even) {
+				background: var(--panel-2);
+			}
+
+			.row.head {
+				border-top: 0;
+				background: var(--bg);
+				color: var(--muted);
+				font-size: 0.85rem;
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+				padding-top: 0.5rem;
+				padding-bottom: 0.5rem;
+			}
+
+			.row.flash {
+				animation: flash 1.6s ease-out;
+			}
+
+			@keyframes flash {
+				from {
+					background: #3a2c17;
+					box-shadow: inset 4px 0 0 var(--accent);
+				}
+			}
+
+			.loc-name {
+				margin: 0;
+				font-size: 1.1rem;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.4rem;
+				align-items: center;
+			}
+
+			.badge {
+				font-size: 0.75rem;
+				font-weight: 600;
+				padding: 0.05rem 0.4rem;
+				border-radius: 4px;
+				background: var(--accent);
+				color: #1a1208;
+			}
+
+			.choice {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.35rem;
+				align-items: baseline;
+				padding: 0.2rem 0;
+			}
+
+			.choice + .choice {
+				border-top: 1px dashed var(--border);
+				padding-top: 0.4rem;
+				margin-top: 0.2rem;
+			}
+
+			.choice-label {
+				font-weight: 600;
+				margin-right: 0.25rem;
+			}
+
+			.choice-label::after {
+				content: ":";
+			}
+
+			.none, .note, .links .label {
+				color: var(--muted);
+			}
+
+			.note {
+				font-size: 0.9rem;
+				flex-basis: 100%;
+				white-space: pre-line;
+			}
+
+			.loc-note {
+				font-size: 0.9rem;
+				color: var(--muted);
+				margin: 0.3rem 0 0;
+			}
+
+			.links + .links {
+				margin-top: 0.5rem;
+			}
+
+			.links .label {
+				font-size: 0.85rem;
+				font-weight: 600;
+			}
+
+			.links ul {
+				list-style: disc;
+				margin: 0.1rem 0 0;
+				padding-left: 1.25rem;
+			}
+
+			.links li {
+				padding: 0.05rem 0;
+			}
+
+			.links li::marker {
+				color: var(--muted);
+			}
+
+			.links a {
+				color: var(--link);
+				text-decoration: none;
+			}
+
+			.links a:hover {
+				text-decoration: underline;
+			}
+
+			.links .cond {
+				color: var(--muted);
+				font-size: 0.85rem;
+			}
+
+			.empty {
+				color: var(--muted);
+				padding: 2rem 0;
+				text-align: center;
+				background: var(--panel);
+			}
+
+			.subtitle {
+				margin: 0;
+				color: var(--muted);
+				font-size: 0.9rem;
+			}
+
+			.subtitle a {
+				color: var(--link);
+			}
+
+			footer {
+				color: var(--muted);
+				font-size: 0.85rem;
+				padding: 0 1.25rem 1.5rem;
+			}
+
+			footer a {
+				color: var(--link);
+			}
+
+			/* Responsive */
+
+			@media (max-width: 800px) {
+				html {
+					font-size: 16px;
+				}
+
+				header {
+					position: static;
+				}
+
+				.row {
+					grid-template-columns: 1fr;
+					gap: 0.5rem;
+				}
+
+				.row.head {
+					display: none;
+				}
+
+				input[type=search] {
+					min-width: 0;
+					flex: 1;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<div class="title-row">
+				<h1>Frostpunk <span>Scouting</span> Cheatsheet</h1>
+				<p class="subtitle">Data from <a href="https://frostpunk.fandom.com/wiki/Scouting" target="_blank" rel="noopener">Frostpunk Wiki</a> (<a href="https://www.fandom.com/licensing" target="_blank" rel="noopener">CC BY-NC-SA</a> licensed)</p>
+			</div>
+			<div class="controls">
+				<label class="field">Scenario: <select id="scenario"></select></label>
+				<input type="search" id="search" placeholder="Search location…" autocomplete="off">
+				<select id="sort">
+					<option value="wiki">Wiki order</option>
+					<option value="name">A–Z</option>
+				</select>
+				<button type="button" id="toggle-all-rewards">Unselect all rewards</button>
+			</div>
+			<div class="filters" id="filters"></div>
+		</header>
+		<main>
+			<p class="scenario-notes" id="scenario-notes"></p>
+			<div class="summary" id="summary"></div>
+			<div class="list" id="list"></div>
+		</main>
+		<footer id="footer">Generated at <span id="generated-at"></span>.</footer>
+		<script>
+			"use strict";
+			const DATA = /*__DATA__*/null;
+
+			// Pseudo reward type for choices/locations that yield no reward at all; not
+			// part of the backend data, so it's added to the type list on the client.
+			const NOTHING = { code: "nothing", name: "Nothing", category: "other" };
+
+			const TYPES = new Map([...DATA.reward_types, NOTHING].map(t => [t.code, t]));
+			const state = { scenarioId: null, search: "", disabledTypes: new Set(), sort: "wiki" };
+			const $ = id => document.getElementById(id);
+
+			function el(tag, props, ...children) {
+				const node = document.createElement(tag);
+				for (const [k, v] of Object.entries(props || {})) {
+					if (k === "class") node.className = v;
+					else if (k.startsWith("on")) node.addEventListener(k.slice(2), v);
+					else node[k] = v;
+				}
+				for (const c of children.flat()) {
+					if (c !== null && c !== undefined && c !== false) node.append(c);
+				}
+				return node;
+			}
+
+			// Minimal markdown-lite for note/label text: **bold**, *italic*, __underline__,
+			// newlines as <br>. Escaped for HTML first, so only our own tags end up in the output.
+			function formatText(str) {
+				if (!str) return "";
+				return str
+					.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+					.replace(/\*\*(.+?)\*\*/gs, "<b>$1</b>")
+					.replace(/\*(.+?)\*/gs, "<i>$1</i>")
+					.replace(/__(.+?)__/gs, "<u>$1</u>")
+					.replace(/\n/g, "<br>");
+			}
+
+			function chip(code) {
+				const t = TYPES.get(code) || { name: code, category: "other" };
+				return el("span", { class: `chip ${t.category}` }, t.name);
+			}
+
+			function scenario() {
+				return DATA.scenarios.find(s => s.id === state.scenarioId);
+			}
+
+			function locationTypes(loc) {
+				const all = new Set(loc.types);
+				loc.rewards.forEach(r => r.types.forEach(t => all.add(t)));
+				return all;
+			}
+
+			// A choice yields "Nothing" when neither the location's own flags (which count
+			// for every choice, e.g. Trading Post) nor the choice itself have any type.
+			// Starting locations always yield "Nothing" too: you never get a reward there.
+			function optionTypes(loc, r) {
+				const have = new Set([...loc.types, ...r.types]);
+				return have.size ? have : new Set([NOTHING.code]);
+			}
+
+			// A location matches the type filter when a single choice yields at least one
+			// enabled type. With nothing disabled (the default), every location matches.
+			function matchesTypes(loc) {
+				if (state.disabledTypes.size === 0) return true;
+				const options = loc.rewards.length ? loc.rewards : [{ types: [] }];
+				return options.some(r => [...optionTypes(loc, r)].some(t => !state.disabledTypes.has(t)));
+			}
+
+			function presentTypes() {
+				const present = new Set();
+				scenario().locations.forEach(loc => {
+					const options = loc.rewards.length ? loc.rewards : [{ types: [] }];
+					options.forEach(r => optionTypes(loc, r).forEach(t => present.add(t)));
+				});
+				return present;
+			}
+
+			function visibleLocations() {
+				const q = state.search.trim().toLowerCase();
+				let locs = scenario().locations.filter(loc =>
+					(!q || loc.name.toLowerCase().includes(q)) && matchesTypes(loc));
+				if (state.sort === "name") locs = [...locs].sort((a, b) => a.name.localeCompare(b.name));
+				return locs;
+			}
+
+			function selectAllRewards() {
+				state.disabledTypes.clear();
+			}
+
+			function unselectAllRewards() {
+				state.disabledTypes = new Set(presentTypes());
+			}
+
+			function renderFilters() {
+				const present = presentTypes();
+				const allSelected = state.disabledTypes.size === 0;
+				$("toggle-all-rewards").textContent = allSelected ? "Unselect all rewards" : "Select all rewards";
+				// Only reward types that occur in the current scenario are offered as filters.
+				// Chips are on (enabled) by default; clicking one toggles it off/on.
+				const buttons = [...DATA.reward_types, NOTHING].filter(t => present.has(t.code)).map(t => {
+					const enabled = !state.disabledTypes.has(t.code);
+					return el("button", {
+						class: `chip ${t.category}` + (enabled ? " on" : ""),
+						onclick: () => {
+							enabled ? state.disabledTypes.add(t.code) : state.disabledTypes.delete(t.code);
+							render();
+						},
+					}, el("span", {}, t.name));
+				});
+				$("filters").replaceChildren(el("span", { class: "hint" }, "Rewards:"), ...buttons);
+			}
+
+			function renderLinks(title, items, byId) {
+				if (!items.length) return null;
+				const sorted = [...items].sort((a, b) => byId.get(a.id).name.localeCompare(byId.get(b.id).name));
+				const list = el("ul", {}, sorted.map(d =>
+					el("li", {},
+						el("a", { href: `#loc-${d.id}`, onclick: e => { e.preventDefault(); jumpTo(d.id); } }, byId.get(d.id).name),
+						d.note && el("span", { class: "cond", innerHTML: ` (${formatText(d.note)})` }))));
+				return el("div", { class: "links" }, el("div", { class: "label" }, `${title}:`), list);
+			}
+
+			function renderRow(loc, byId) {
+				const place = el("div", {},
+					el("h2", { class: "loc-name" }, loc.name,
+						loc.is_home && el("span", { class: "badge" }, "Home"),
+						...loc.types.map(chip)),
+					loc.notes && el("p", { class: "loc-note", innerHTML: formatText(loc.notes) }));
+				const choices = el("div", {});
+				if (!loc.rewards.length) {
+					choices.append(el("div", { class: "none" }, loc.is_home ? "Starting location" : "No reward data on the wiki."));
+				}
+				for (const r of loc.rewards) {
+					choices.append(el("div", { class: "choice" },
+						r.label && el("span", { class: "choice-label", innerHTML: formatText(r.label) }),
+						r.types.length ? r.types.map(chip) : !r.notes && el("span", { class: "none" }, "Nothing"),
+						r.notes && el("div", { class: "note", innerHTML: formatText(r.notes) })));
+				}
+				const links = el("div", {},
+					renderLinks("Leads to", loc.leads_to, byId),
+					renderLinks("Found from", loc.found_from, byId));
+				return el("div", { class: "row", id: `loc-${loc.id}` }, place, choices, links);
+			}
+
+			function renderList() {
+				const s = scenario();
+				const byId = new Map(s.locations.map(l => [l.id, l]));
+				const locs = visibleLocations();
+				$("scenario-notes").innerHTML = formatText(s.notes || "");
+				$("summary").textContent = `${locs.length} of ${s.locations.length} locations`;
+				const head = el("div", { class: "row head" },
+					el("div", {}, "Location"), el("div", {}, "Choices & rewards"), el("div", {}, "Discoveries"));
+				$("list").replaceChildren(head, ...(locs.length
+					? locs.map(loc => renderRow(loc, byId))
+					: [el("div", { class: "empty" }, "No locations match the current filters.")]));
+			}
+
+			function render() {
+				renderFilters();
+				renderList();
+			}
+
+			function resetFilters() {
+				state.search = "";
+				selectAllRewards();
+				$("search").value = "";
+			}
+
+			function selectScenario(id) {
+				state.scenarioId = id;
+				state.disabledTypes.clear();
+				$("scenario").value = String(id);
+				history.replaceState(null, "", `#s${id}`);
+				render();
+				window.scrollTo(0, 0);
+			}
+
+			function jumpTo(id) {
+				if (!$(`loc-${id}`)) {
+					resetFilters();
+					render();
+				}
+				const row = $(`loc-${id}`);
+				// Scroll so the row lands just below the sticky header.
+				const header = document.querySelector("header");
+				const offset = getComputedStyle(header).position === "sticky" ? header.offsetHeight : 0;
+				const top = row.getBoundingClientRect().top + window.scrollY - offset - 8;
+				window.scrollTo({ top, behavior: "smooth" });
+				row.classList.remove("flash");
+				void row.offsetWidth;
+				row.classList.add("flash");
+			}
+
+			function init() {
+				const fromHash = Number((location.hash.match(/^#s(\d+)$/) || [])[1]);
+				state.scenarioId = DATA.scenarios.some(s => s.id === fromHash) ? fromHash : DATA.scenarios[0].id;
+				$("scenario").replaceChildren(...DATA.scenarios.map(s => el("option", { value: String(s.id) }, s.name)));
+				$("scenario").value = String(state.scenarioId);
+				$("scenario").addEventListener("change", e => selectScenario(Number(e.target.value)));
+				$("search").addEventListener("input", e => { state.search = e.target.value; renderList(); });
+				$("sort").addEventListener("change", e => { state.sort = e.target.value; renderList(); });
+				$("toggle-all-rewards").addEventListener("click", () => {
+					state.disabledTypes.size === 0 ? unselectAllRewards() : selectAllRewards();
+					render();
+				});
+				$("generated-at").textContent = new Date(DATA.generated_at).toLocaleString(undefined, {
+					dateStyle: "medium",
+					timeStyle: "short",
+				});
+				render();
+			}
+
+			init();
+		</script>
+	</body>
+</html>
